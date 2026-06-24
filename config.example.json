@@ -1,0 +1,32 @@
+{
+  "_comment": "Copy this file to config.json and fill in your own values. config.json is gitignored.",
+
+  "notion": {
+    "_comment": "Run this once with curl to find IDs:\n  curl 'https://api.notion.com/v1/search' \\\n    -H 'Authorization: Bearer <YOUR_TOKEN>' \\\n    -H 'Notion-Version: 2026-03-11' \\\n    -d '{\"query\": \"<page or database title>\"}'\n  Then read the 'id' field from the response.",
+
+    "integration_token_env": "NOTION_TOKEN",
+    "integration_token_path": "~/.workbuddy/secrets/notion.json",
+
+    "life_list_database_id": "<UUID of your bird life-list database, e.g. 37871355-4c9a-8073-b4a3-000b9cc2ea18>",
+
+    "orders_database_id": "<UUID of your bird Orders catalog database (optional)>",
+
+    "bird_root_page_id": "<UUID of '🪶 鸟' page (optional)>",
+    "plant_root_page_id": "<UUID of '🌱 百草园' page (optional)>",
+    "insect_root_page_id": null,
+
+    "nature_root_page_id": "<UUID of root '🌳 自然' page (optional, used as fallback parent)>"
+  },
+
+  "xenocanto": {
+    "_comment": "Get a free API key at https://xeno-canto.org/account",
+    "api_key_path": "~/.workbuddy/secrets/xenocanto.json"
+  },
+
+  "user_preferences": {
+    "primary_location": "广州",
+    "regional_focus": "华南",
+    "regional_focus_country": "China",
+    "image_inclusion_policy": "信息增量原则；古画/解剖/系统树优先；普通生态摄影不放"
+  }
+}

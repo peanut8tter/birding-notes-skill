@@ -1,0 +1,30 @@
+# Local config with private Notion IDs
+config.json
+
+# Secrets (should never live in this repo, but defensively gitignore)
+secrets/
+*.token
+*.key
+
+# Cached audio / spectrogram / map files
+data/
+*.mp3
+*.png
+*.jpg
+*.jpeg
+*.webp
+!docs/**/*.png
+!docs/**/*.jpg
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+*.swp
