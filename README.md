@@ -36,18 +36,15 @@ birding-notes 把上述痛点固化成规则，焊死。
 
 ## 安装
 
-### 1. Clone 到你的 skills 目录
+### 1. Clone 并一键链接（含 4 个 skill）
 
 ```bash
-# WorkBuddy 用户级（跨工作空间）
-git clone https://github.com/peanut8tter/birding-notes-skill ~/.workbuddy/skills/birding-notes
-
-# 或 Claude Code 用户级
-git clone https://github.com/peanut8tter/birding-notes-skill ~/.claude/skills/birding-notes
-
-# 或项目级（仅当前项目生效）
-git clone https://github.com/peanut8tter/birding-notes-skill ./.workbuddy/skills/birding-notes
+git clone git@github.com:peanut8tter/birding-notes-skill.git ~/birding-notes-skill
+cd ~/birding-notes-skill
+./install.sh          # WorkBuddy；Claude Code 用 ./install.sh claude
 ```
+
+会把 `skills/` 下的 `birding-notes`、`avilist-bird-lookup`、`bird-batch-pipeline`、`notion-image-upload-migration` 软链到 skills 目录；以后 `git pull` 即同步更新。
 
 ### 2. 配置 Notion Integration
 
@@ -87,15 +84,9 @@ echo '{"api_key": "<your_xc_key>"}' > ~/.workbuddy/secrets/xenocanto.json
 chmod 600 ~/.workbuddy/secrets/xenocanto.json
 ```
 
-### 5. 安装配套 skill：avilist-bird-lookup（推荐）
+### 5. AviList 本地数据
 
-鸟类专项数据查证 skill。本 skill 在写鸟类条目时会调用它做学名/英文名/目/科查证。
-
-```bash
-git clone https://github.com/peanut8tter/avilist-bird-lookup ~/.workbuddy/skills/avilist-bird-lookup
-```
-
-> 如果你只用本 skill 不写鸟，跳过这步即可。
+`assets/avilist_species.json`（AviList v2025，11,131 种）已随仓库提供，`avilist-bird-lookup` 直接查询即可，无需再下载解析。
 
 ## 使用
 
@@ -132,14 +123,18 @@ git clone https://github.com/peanut8tter/avilist-bird-lookup ~/.workbuddy/skills
 
 ```
 birding-notes-skill/
-├── SKILL.md              # 主 skill 文件，AI 加载的协议
-├── README.md             # 你正在看的这个
-├── LICENSE               # MIT
-├── config.example.json   # 配置范例（你 cp 一份改成 config.json）
-├── .gitignore
-└── scripts/
-    └── xc_query.py       # xeno-canto API 查询脚本（CLI）
+├── skills/
+│   ├── birding-notes/                 # 主协议：术语、数据源、Notion 落地规范
+│   ├── avilist-bird-lookup/           # AviList v2025 学名/目/科查证 + LifeList 上新流程
+│   ├── bird-batch-pipeline/           # 批量建行、配图流水线（examples/ 为可复用脚本）
+│   └── notion-image-upload-migration/ # 外链图迁移为 Notion 托管文件
+├── assets/avilist_species.json        # AviList 本地数据
+├── install.sh                         # 一键软链
+├── config.example.json                # 复制为 config.json 填写（已 gitignore）
+└── LICENSE
 ```
+
+> examples/ 里的脚本通过环境变量 `NOTION_TOKEN` 读取 token，**不要把 token 写进仓库**。
 
 ## 设计原则
 

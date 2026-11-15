@@ -252,6 +252,9 @@ data = json.loads(urllib.request.urlopen(urllib.request.Request(url, headers={'U
 | 喜鹊（东亚） | *Pica serica*（Oriental Magpie） | 已从 *P. pica* 拆分 |
 | 金腰燕 | *Cecropis daurica* | AviList 英文名 **Eastern Red-rumped Swallow**（拆分） |
 | 斑嘴鸭（东亚） | *Anas zonorhyncha* | 已从 *A. poecilorhyncha* 拆分 |
+| 金眶鸻 | *Thinornis dubius* | AviList v2025 已从 *Charadrius dubius* 移入 *Thinornis* 属；GBIF 主干仍用 Charadrius（bookmark 用 Charadrius 种级 key 7937336） |
+| 赤腹鹰 | *Tachyspiza soloensis* | AviList v2025 已从 *Accipiter* 移入新属 **Tachyspiza**（旧世界小鹰大拆分）；GBIF 主干仍用 Accipiter（bookmark 用 *Accipiter soloensis* 种级 key 2480588） |
+| 淡眉雀鹛（华东） | *Alcippe hueti*（Huet's Fulvetta） | AviList v2025 已从灰眶雀鹛复合体独立成种；*A. morrisonia*（Grey-cheeked Fulvetta）现专指台湾种 |
 
 > 不同地区的高风险清单不同，请按当地实情扩充。
 
@@ -346,6 +349,8 @@ API v2025-09-03 起：**select 字段的 option 名字和颜色一旦创建就�
 2. 抄录作者 / 来源 / 许可证字段
 3. 对不可访问、404、内容不符的链接**立刻丢弃，重新找**
 4. **绝不输出未经验证的具体资源链接**
+
+> ⚠️ **Wikimedia 直链的 hash 前缀（如 `/commons/f/f5/`）不能凭文件名推断**——它是文件名的 MD5，只能从 File 页正文里抄。凭「文件名 + 猜测的 hash」拼出的 upload.wikimedia.org 直链几乎必然 404。每张图都要打开其 File 页，从「Original file」链接抄真实直链。
 
 #### 例外：xeno-canto 走 API v3，不走 WebFetch
 
