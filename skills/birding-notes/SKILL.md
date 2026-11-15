@@ -15,9 +15,10 @@ agent_created: false
 
 ## 0. 配置（首次安装必须做）
 
-本 skill 引用一份 `config.json`（与 SKILL.md 同目录），描述你的 Notion 工作空间结构、地理偏好等。
+**首次使用 / 缺配置时先走 `birding-setup`**：任何 Notion 读写之前，先运行
+`python3 <birding-setup 目录>/scripts/setup_helper.py status`；返回 `ready: false` 就加载 `birding-setup` skill 完成引导，再继续用户原本的任务。
 
-复制 `config.example.json` 为 `config.json`，填入你自己的值。详细字段说明见 README。
+配置位置：`~/.workbuddy/birding-notes/config.json`（Notion 数据库 ID、地理偏好）；token 在 `~/.workbuddy/secrets/`。均不在仓库内。字段说明见 `config.example.json`。
 
 最低必填：
 

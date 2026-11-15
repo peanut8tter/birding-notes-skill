@@ -15,4 +15,5 @@ for d in "$HERE"/skills/*/; do
   echo "linked $name -> $DEST/$name"
 done
 echo "AviList 数据: $HERE/assets/avilist_species.json"
-echo "下一步: cp config.example.json config.json 并填写; export NOTION_TOKEN=ntn_xxx"
+echo ""
+echo "安装完成。下一步：打开 WorkBuddy / Claude Code，对 AI 说「初始化观鸟笔记」，它会一步步问你 Notion token 等信息。"

@@ -4,7 +4,7 @@
 import json, subprocess, time, os, sys
 
 import os
-TOKEN = os.environ["NOTION_TOKEN"]  # export NOTION_TOKEN=ntn_xxx
+TOKEN = os.environ.get("NOTION_TOKEN") or json.load(open(os.path.expanduser("~/.workbuddy/secrets/notion.json")))["integration_token"]  # 由 birding-setup 保存
 DBID = "37871355-4c9a-80db-91f4-f3480c7fa819"
 DS = "37871355-4c9a-8073-b4a3-000b9cc2ea18"
 RESOLVE = ["--noproxy", "*", "--resolve", "api.notion.com:443:208.103.161.16"]

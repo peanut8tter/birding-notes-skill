@@ -7,7 +7,7 @@
 import json, subprocess, sys, time, os, mimetypes
 
 import os
-TOKEN = os.environ["NOTION_TOKEN"]  # export NOTION_TOKEN=ntn_xxx
+TOKEN = os.environ.get("NOTION_TOKEN") or json.load(open(os.path.expanduser("~/.workbuddy/secrets/notion.json")))["integration_token"]  # 由 birding-setup 保存
 VER = "2026-03-11"
 DS = "37871355-4c9a-8073-b4a3-000b9cc2ea18"  # LifeList data_source（2026-10-24 实测有效）
 CACHE = "/tmp/lifelist_migration"

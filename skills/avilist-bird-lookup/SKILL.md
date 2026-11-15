@@ -8,6 +8,8 @@ description_en: AviList bird lookup
 agent_created: true
 ---
 
+> **前置检查**：涉及 Notion 读写前，先运行 `birding-setup/scripts/setup_helper.py status`；`ready: false` 就加载 `birding-setup` 完成配置引导，再继续本任务。
+
 # avilist-bird-lookup
 
 ## When to use

@@ -17,10 +17,12 @@ import argparse, json, os, sys, urllib.request, urllib.parse
 
 def load_config():
     here = os.path.dirname(os.path.abspath(__file__))
-    cfg_path = os.path.join(os.path.dirname(here), "config.json")
+    cfg_path = os.path.expanduser("~/.workbuddy/birding-notes/config.json")
+    if not os.path.exists(cfg_path):
+        cfg_path = os.path.join(os.path.dirname(here), "config.json")  # 旧位置兜底
     if not os.path.exists(cfg_path):
         print(
-            "ERROR: config.json not found. Copy config.example.json to config.json and fill in your values.",
+            "ERROR: 未找到配置。请让 AI 运行 birding-setup 向导。",
             file=sys.stderr,
         )
         sys.exit(1)

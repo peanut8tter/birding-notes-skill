@@ -4,6 +4,8 @@ description: 批量把鸟类条目从中文名清单入库到 Notion（建行、
 agent_created: true
 ---
 
+> **前置检查**：涉及 Notion 读写前，先运行 `birding-setup/scripts/setup_helper.py status`；`ready: false` 就加载 `birding-setup` 完成配置引导，再继续本任务。
+
 # 批量入库流水线
 
 ## 目的

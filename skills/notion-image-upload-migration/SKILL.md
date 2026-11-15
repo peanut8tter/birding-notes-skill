@@ -4,6 +4,8 @@ description: 把 Notion 页面里的外链图片（external URL，尤其 Wikimed
 agent_created: true
 ---
 
+> **前置检查**：涉及 Notion 读写前，先运行 `birding-setup/scripts/setup_helper.py status`；`ready: false` 就加载 `birding-setup` 完成配置引导，再继续本任务。
+
 # Notion 外链图 → 本地上传迁移
 
 **用户已拍板（2026-10-25）：今后所有 Notion 库新建/补充配图一律走本 skill 的上传流程，不再贴 external URL。**

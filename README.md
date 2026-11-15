@@ -44,45 +44,23 @@ cd ~/birding-notes-skill
 ./install.sh          # WorkBuddy；Claude Code 用 ./install.sh claude
 ```
 
-会把 `skills/` 下的 `birding-notes`、`avilist-bird-lookup`、`bird-batch-pipeline`、`notion-image-upload-migration` 软链到 skills 目录；以后 `git pull` 即同步更新。
+会把 `skills/` 下的 `birding-setup`（配置向导）、`birding-notes`、`avilist-bird-lookup`、`bird-batch-pipeline`、`notion-image-upload-migration` 软链到 skills 目录；以后 `git pull` 即同步更新。
 
-### 2. 配置 Notion Integration
+### 2. 配置：直接对 AI 说「初始化观鸟笔记」
 
-在 [Notion Settings → Integrations](https://www.notion.so/profile/integrations) 创建一个 Internal Integration，得到 token（`ntn_...`）。
+不用手写 JSON。`birding-setup` skill 会一问一答带你配完：
 
-把以下 page / database **共享**给该 integration：
-- 你的鸟类 life list database
-- 你的"鸟类目录 Orders" database（如有）
-- 你的"自然 / 鸟 / 百草园 / 虫"等根 page
+1. 你的 Notion Internal Integration token（会先向 Notion 校验再保存，权限 600）
+2. 把 life list 数据库共享给 integration，AI 帮你搜到并记下数据库 ID
+3. 可选：目录库、xeno-canto API key（鸣声）、常驻地点与关注区域
 
-把 token 存到 `~/.workbuddy/secrets/notion.json`：
+之后第一次让 AI 干观鸟相关的活，如果没配置，它也会自动进入这个向导，配完继续你原来的任务。
 
-```bash
-mkdir -p ~/.workbuddy/secrets
-chmod 700 ~/.workbuddy/secrets
-echo '{"integration_token": "ntn_xxxxxxxxx"}' > ~/.workbuddy/secrets/notion.json
-chmod 600 ~/.workbuddy/secrets/notion.json
-```
+存放位置（都在仓库外，不会被提交）：
+- 配置：`~/.workbuddy/birding-notes/config.json`
+- 密钥：`~/.workbuddy/secrets/notion.json`、`xenocanto.json`
 
-### 3. 拷贝并填写 config.json
-
-```bash
-cd ~/.workbuddy/skills/birding-notes  # 或你 clone 的位置
-cp config.example.json config.json
-```
-
-编辑 `config.json`，填入你的：
-- Notion database / page IDs（用 `mcp__notion__notion-search` 工具或 Notion API 查到）
-- 地理偏好（默认是广州 / 华南 / China，可改）
-
-### 4. 注册 xeno-canto API key（鸟类鸣声查询）
-
-去 [xeno-canto.org/account](https://xeno-canto.org/account) 免费注册账号，登录后底部生成 API key。
-
-```bash
-echo '{"api_key": "<your_xc_key>"}' > ~/.workbuddy/secrets/xenocanto.json
-chmod 600 ~/.workbuddy/secrets/xenocanto.json
-```
+Notion integration 创建入口：[notion.so/profile/integrations](https://www.notion.so/profile/integrations)（类型选 Internal，token 以 `ntn_` 开头）。
 
 ### 5. AviList 本地数据
 
@@ -124,17 +102,18 @@ chmod 600 ~/.workbuddy/secrets/xenocanto.json
 ```
 birding-notes-skill/
 ├── skills/
+│   ├── birding-setup/                 # 首次配置向导（一问一答）
 │   ├── birding-notes/                 # 主协议：术语、数据源、Notion 落地规范
 │   ├── avilist-bird-lookup/           # AviList v2025 学名/目/科查证 + LifeList 上新流程
 │   ├── bird-batch-pipeline/           # 批量建行、配图流水线（examples/ 为可复用脚本）
 │   └── notion-image-upload-migration/ # 外链图迁移为 Notion 托管文件
 ├── assets/avilist_species.json        # AviList 本地数据
 ├── install.sh                         # 一键软链
-├── config.example.json                # 复制为 config.json 填写（已 gitignore）
+├── config.example.json                # 配置字段说明（实际配置由向导生成，不在仓库内）
 └── LICENSE
 ```
 
-> examples/ 里的脚本通过环境变量 `NOTION_TOKEN` 读取 token，**不要把 token 写进仓库**。
+> examples/ 里的脚本从环境变量 `NOTION_TOKEN` 或 `~/.workbuddy/secrets/notion.json` 读取 token，**不要把 token 写进仓库**。
 
 ## 设计原则
 
