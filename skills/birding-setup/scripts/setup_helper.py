@@ -100,8 +100,14 @@ def cmd_find(q):
     r = notion("/search", {"query": q, "page_size": 10})
     if "error" in r:
         out({"ok": False, "detail": r}); sys.exit(1)
-    out({"ok": True, "results": [
-        {"id": x["id"], "type": x["object"], "title": title_of(x)} for x in r.get("results", [])],
+    res = []
+    for x in r.get("results", []):
+        item = {"id": x["id"], "type": x["object"], "title": title_of(x)}
+        if x["object"] == "data_source":  # 新版 API：搜索返回数据源，其所属数据库 ID 在 parent 里
+            item["data_source_id"] = x["id"]
+            item["database_id"] = (x.get("parent") or {}).get("database_id")
+        res.append(item)
+    out({"ok": True, "results": res,
         "hint": "结果为空说明该页面/数据库还没共享给 integration（页面右上角 … → Connections → 添加）"})
 
 

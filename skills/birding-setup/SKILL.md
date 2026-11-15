@@ -44,11 +44,12 @@ python3 HELPER find "<数据库名，问用户>"
 ```
 - 找到多个 → 列出标题让用户选
 - 一个都没有 → 多半是没共享成功，回到上面那步
-选定后保存：
+选定后**两个 ID 都保存**（新版 Notion 搜索返回的是数据源，结果里同时给出 `data_source_id` 和 `database_id`）：
 ```bash
-python3 HELPER set notion.life_list_database_id <id>
+python3 HELPER set notion.life_list_database_id <database_id>
+python3 HELPER set notion.life_list_data_source_id <data_source_id>
 ```
-数据库 ID 是 database id（不是页面 URL 末尾那串，除非恰好相同）。
+保存后可用 `GET /v1/data_sources/<data_source_id>` 确认字段（中文名、学名、居留型等）存在。
 
 ### 3. 可选项（逐个问，允许跳过）
 a. **目录库 / 根页面**：「你有『鸟类目录 Orders』数据库或自然根页面吗？」有就 `find` + `set notion.orders_database_id <id>`，没有跳过。
