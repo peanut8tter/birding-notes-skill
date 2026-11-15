@@ -32,12 +32,16 @@ AviList 官网（avilist.org）只提供 Excel 下载，没有 API/CSV。本 ski
 
 ## Steps
 
-### 1. 准备本地数据（仅首次或换工作空间时）
+### 1. 准备本地数据
+
+**优先直接用仓库自带数据**：`<仓库根>/assets/avilist_species.json`（AviList v2025，11,131 种，已解析好）。
+`verify_candidates.py` 默认就读它，**文件存在则跳过本步**。
+
+仅当该文件缺失、或 AviList 发布新版需要更新时，才重新下载解析：
 
 ```bash
-# 下载官方数据
-mkdir -p {WORKSPACE}/data
-curl -sL -o {WORKSPACE}/data/avilist-v2025.xlsx \
+# 下载官方数据（xlsx 放临时目录即可）
+curl -sL -o /tmp/avilist-v2025.xlsx \
   "https://www.avilist.org/wp-content/uploads/2025/06/AviList-v2025-11Jun-short.xlsx"
 
 # 准备 Python 环境
@@ -45,8 +49,8 @@ VENV=~/.venvs/birding
 if [ ! -d "$VENV" ]; then python3 -m venv $VENV; fi
 $VENV/bin/pip install --quiet openpyxl
 
-# 解析为 JSON
-$VENV/bin/python3 scripts/parse_avilist.py
+# 解析为 JSON（默认写到 <仓库根>/assets/avilist_species.json）
+$VENV/bin/python3 scripts/parse_avilist.py /tmp/avilist-v2025.xlsx
 ```
 
 参考脚本: @scripts/parse_avilist.py
@@ -86,7 +90,7 @@ d. 对高风险条目（属名变更、近年拆分、地理种）做近缘种�
 - **种级拆分（沙鸻复合体，2026-11-09）**：原「Lesser Sand Plover」复合体拆为 **Anarhynchus mongolus（Siberian Sand Plover，西伯利亚繁殖）** 与 **A. atrifrons（Tibetan Sand Plover，青藏繁殖）**；郑光美中文名「蒙古沙鸻」对应 A. mongolus，AviList 英文名已不是 Mongolian Plover
 - **保护等级易错（鸬鹚，2026-11-09）**：2021 名录鸬鹚科**仅黑颈鸬鹚、海鸬鹚二级**——普通鸬鹚未列入一二级，按三有填（勿凭印象填二级）
 - **白脸鸻（2026-11-09）**：IUCN 2023 已按独立种评估为 LC；华南沿海留鸟；2023 三有名录未以本名单列，按原环颈鸻口径填三有并在正文注明
-- **LifeList 单条上新的最新可复用脚本**：`{WORKSPACE}/data/create_2026-11-01.py`（建行+全字段含 IUCN/中国保护等级+蜂鹰样板 bullet 正文+上传配图，可重入）
+- **LifeList 单条上新的最新可复用脚本**：`skills/bird-batch-pipeline/examples/create_2026-11-01.py`（建行+全字段含 IUCN/中国保护等级+蜂鹰样板 bullet 正文+上传配图，可重入）
 
 ### 4. 中文目/科映射表（备用）
 

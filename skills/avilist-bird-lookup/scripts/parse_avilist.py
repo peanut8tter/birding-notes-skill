@@ -1,11 +1,12 @@
 """把 AviList v2025 Excel 转成 JSON 便于查询。
 用法: python3 parse_avilist.py <xlsx_path> <output_json_path>
 """
-import sys, json
+import sys, os, json
 from openpyxl import load_workbook
 
 xlsx = sys.argv[1] if len(sys.argv)>1 else 'data/avilist-v2025.xlsx'
-out = sys.argv[2] if len(sys.argv)>2 else 'data/avilist_species.json'
+HERE = os.path.dirname(os.path.realpath(__file__))
+out = sys.argv[2] if len(sys.argv)>2 else os.path.normpath(os.path.join(HERE, '..', '..', '..', 'assets', 'avilist_species.json'))
 
 wb = load_workbook(xlsx, read_only=True, data_only=True)
 ws = wb['AviList v2025 extended']
