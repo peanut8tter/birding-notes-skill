@@ -1,13 +1,12 @@
 ---
 name: birding-notes
 description: 学习与记录鸟类、植物、昆虫等自然知识的工作约定。当用户讨论物种识别、目科分类、自然观察笔记，或说出「记入到 Notion」「写进 life list」等触发词时加载。规定术语标注、数据源校验、Notion 落地、内容结构、配图规范。
-agent_created: false
 ---
 
 # birding-notes — 自然知识学习与记录约定
 
 > 本 skill 是为「在 Notion 维护 life list / 鸟类植物昆虫观察笔记」的人设计的工作流协议。
-> 由 [@peanut8tter](https://github.com/peanut8tter) 在 WorkBuddy / Claude Code 上沉淀，欢迎 fork 和改造。
+> 由 [@peanut8tter](https://github.com/peanut8tter) 沉淀，适用于任何支持 SKILL.md / AGENTS.md 的 AI 编码助手（Codex、Claude Code、WorkBuddy、Cursor 等），欢迎 fork 和改造。
 >
 > 一旦加载，AI 必须遵守，直到用户显式覆盖某条规则。
 
@@ -16,14 +15,14 @@ agent_created: false
 ## 0. 配置（首次安装必须做）
 
 **首次使用 / 缺配置时先走 `birding-setup`**：任何 Notion 读写之前，先运行
-`python3 <birding-setup 目录>/scripts/setup_helper.py status`；返回 `ready: false` 就加载 `birding-setup` skill 完成引导，再继续用户原本的任务。
+`python3 <birding-setup 目录>/scripts/setup_helper.py status`；返回 `ready: false` 就按 `birding-setup/SKILL.md`（同仓库 skills/ 下）完成引导，再继续用户原本的任务。
 
-配置位置：`~/.workbuddy/birding-notes/config.json`（Notion 数据库 ID、地理偏好）；token 在 `~/.workbuddy/secrets/`。均不在仓库内。字段说明见 `config.example.json`。
+配置位置：`~/.config/birding-notes/config.json`（Notion 数据库 ID、地理偏好）；token 在 `~/.config/birding-notes/secrets/`；可用环境变量 `BIRDING_NOTES_HOME` 改位置。均不在仓库内。字段说明见 `config.example.json`。
 
 最低必填：
 
 - `notion.life_list_database_id`
-- `xenocanto.api_key_path`（默认 `~/.workbuddy/secrets/xenocanto.json`）
+- xeno-canto API key（可选，查鸣声用；环境变量 `XENOCANTO_KEY` 或 `secrets/xenocanto.json`）
 
 ---
 
@@ -162,11 +161,12 @@ Notion 数据库已有「居留型」固定字段，正文不复述。skill 仍�
 
 #### 选录音的流程（用 xeno-canto API v3）
 
-API key 文件：路径由 `config.xenocanto.api_key_path` 指定（默认 `~/.workbuddy/secrets/xenocanto.json`，单字段 `api_key`）。注册 key：[xeno-canto.org/account](https://xeno-canto.org/account)。
+API key：环境变量 `XENOCANTO_KEY`，或 `~/.config/birding-notes/secrets/xenocanto.json`（单字段 `api_key`）。注册 key：[xeno-canto.org/account](https://xeno-canto.org/account)。
 
 ```python
 import json, urllib.request, urllib.parse
-key = json.load(open(__import__('os').path.expanduser('~/.workbuddy/secrets/xenocanto.json')))['api_key']
+import os
+key = os.environ.get('XENOCANTO_KEY') or json.load(open(os.path.expanduser('~/.config/birding-notes/secrets/xenocanto.json')))['api_key']
 q = f'gen:"<Genus>" sp:"<species>"'  # 必须 tag 语法
 url = f"https://xeno-canto.org/api/3/recordings?query={urllib.parse.quote_plus(q)}&key={key}"
 data = json.loads(urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent':'Mozilla/5.0'}), timeout=30).read())
@@ -384,7 +384,7 @@ Notion 的**超链接 / bookmark 形式**（带 cover 缩略图），**不上传
    - §4.2 识别区分仅在**用户问过相关问题**后写入
 3. **配图就近嵌入**对应文字旁
 4. **落地** — 按 §5.2 决定路径
-5. **写入 Notion** — 通过 `mcp__notion__*` 工具或 Notion REST API 直接写。三件套（中文名/英文名/学名）走 Notion 字段，不写正文
+5. **写入 Notion** — 用你环境里可用的 Notion 工具（MCP / 连接器 / CLI 均可）或直接调 Notion REST API 写。三件套（中文名/英文名/学名）走 Notion 字段，不写正文
 6. **首次副作用**：
    - 若昆虫大类 page 不存在且本次入库是昆虫 → 自动创建
    - 若涉及新目 / 新科 → 按 `avilist-bird-lookup` 流程补建（仅鸟类）

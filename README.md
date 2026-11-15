@@ -10,7 +10,7 @@ Status: 个人在用 · 欢迎 fork
 
 ## 这是什么
 
-一份 markdown 写成的 **Agent Skill**——加载到 WorkBuddy / Claude Code 等支持 Anthropic Skills 规范的 AI 客户端后，AI 在你讨论物种、观察笔记、写入 Notion 时会**自动遵守**里面的工作约定。
+一份 markdown 写成的 **Agent Skill**——加载到任何支持 **Agent Skills 开放标准**（`SKILL.md`）的 AI 助手（Codex、Claude Code、WorkBuddy、Cursor 等）后，AI 在你讨论物种、观察笔记、写入 Notion 时会**自动遵守**里面的工作约定。
 
 它不是一个软件，是 **AI 与你之间签订的工作流协议**。每次自然知识相关对话自动加载，免去你反复叮嘱的成本。
 
@@ -30,21 +30,34 @@ birding-notes 把上述痛点固化成规则，焊死。
 ## 谁该用
 
 - 在 **Notion** 里维护鸟类 life list 或自然观察笔记
-- 用 **WorkBuddy / Claude Code / Claude Desktop** 之类支持 Skills 的 AI
+- 用 **Codex / Claude Code / WorkBuddy / Cursor** 等任一支持 Skills（或 AGENTS.md）的 AI 助手
 - 偏向「按 AviList v2025 / POWO / iNaturalist 等权威数据源 + 加 Notion 自动写入」的工作流
 - 希望 AI 输出**结构化、可信、信息密度高**的物种条目
 
 ## 安装
 
-### 1. Clone 并一键链接（含 4 个 skill）
+### 1. Clone 并一键链接（含 5 个 skill）
 
 ```bash
-git clone git@github.com:peanut8tter/birding-notes-skill.git ~/birding-notes-skill
+git clone https://github.com/peanut8tter/birding-notes-skill.git ~/birding-notes-skill
 cd ~/birding-notes-skill
-./install.sh          # WorkBuddy；Claude Code 用 ./install.sh claude
+./install.sh                # 默认装到 ~/.agents/skills（Codex 等通用位置）
 ```
 
-会把 `skills/` 下的 `birding-setup`（配置向导）、`birding-notes`、`avilist-bird-lookup`、`bird-batch-pipeline`、`notion-image-upload-migration` 软链到 skills 目录；以后 `git pull` 即同步更新。
+按你用的助手选目标：
+
+| 命令 | 链接到 | 适用 |
+|---|---|---|
+| `./install.sh` | `~/.agents/skills` | **Codex** 及遵循通用标准的助手（推荐默认） |
+| `./install.sh claude` | `~/.claude/skills` | Claude Code |
+| `./install.sh workbuddy` | `~/.workbuddy/skills` | WorkBuddy |
+| `./install.sh codex` | `~/.codex/skills` | Codex 旧版目录 |
+| `./install.sh all` | 以上全部 | 多个助手并用 |
+| `./install.sh /你的/路径` | 任意目录 | 其他 |
+
+用软链安装，以后 `git pull` 即同步更新。
+
+**你的助手不支持 skills？** 把仓库里的 [`AGENTS.md`](AGENTS.md) 复制到项目根目录（或让助手先读它），它会指引助手按需读取 `skills/*/SKILL.md`。
 
 ### 2. 配置：直接对 AI 说「初始化观鸟笔记」
 
@@ -57,8 +70,9 @@ cd ~/birding-notes-skill
 之后第一次让 AI 干观鸟相关的活，如果没配置，它也会自动进入这个向导，配完继续你原来的任务。
 
 存放位置（都在仓库外，不会被提交）：
-- 配置：`~/.workbuddy/birding-notes/config.json`
-- 密钥：`~/.workbuddy/secrets/notion.json`、`xenocanto.json`
+- 配置：`~/.config/birding-notes/config.json`
+- 密钥：`~/.config/birding-notes/secrets/notion.json`、`xenocanto.json`
+- 想换位置：设置环境变量 `BIRDING_NOTES_HOME`
 
 Notion integration 创建入口：[notion.so/profile/integrations](https://www.notion.so/profile/integrations)（类型选 Internal，token 以 `ntn_` 开头）。
 
@@ -108,12 +122,13 @@ birding-notes-skill/
 │   ├── bird-batch-pipeline/           # 批量建行、配图流水线（examples/ 为可复用脚本）
 │   └── notion-image-upload-migration/ # 外链图迁移为 Notion 托管文件
 ├── assets/avilist_species.json        # AviList 本地数据
+├── AGENTS.md                          # 不支持 skills 的助手入口
 ├── install.sh                         # 一键软链
 ├── config.example.json                # 配置字段说明（实际配置由向导生成，不在仓库内）
 └── LICENSE
 ```
 
-> examples/ 里的脚本从环境变量 `NOTION_TOKEN` 或 `~/.workbuddy/secrets/notion.json` 读取 token，**不要把 token 写进仓库**。
+> examples/ 里的脚本从环境变量 `NOTION_TOKEN` 或 `~/.config/birding-notes/secrets/notion.json` 读取 token，**不要把 token 写进仓库**。
 
 ## 设计原则
 
@@ -152,7 +167,7 @@ skill 本身（本仓库）：MIT。
 - [GBIF](https://www.gbif.org) — 全球生物多样性数据
 - [Wikimedia Commons](https://commons.wikimedia.org) — 公开许可的媒体
 - 郑光美《中国鸟类分类与分布名录》第三版 — 中文译名标准
-- WorkBuddy / Claude Code 团队 — Skills 框架
+- Anthropic 与 OpenAI 等推动的 [Agent Skills](https://agentskills.io) 开放标准
 
 ## 贡献
 

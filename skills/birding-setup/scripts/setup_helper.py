@@ -12,11 +12,16 @@
 import json, os, sys, urllib.request, urllib.error
 
 HOME = os.path.expanduser("~")
-CFG_DIR = os.path.join(HOME, ".workbuddy", "birding-notes")
-CFG = os.path.join(CFG_DIR, "config.json")
-SECRETS = os.path.join(HOME, ".workbuddy", "secrets")
+# 与具体 AI 客户端无关：默认 ~/.config/birding-notes，可用环境变量 BIRDING_NOTES_HOME 覆盖
+BASE = os.environ.get("BIRDING_NOTES_HOME") or os.path.join(HOME, ".config", "birding-notes")
+CFG = os.path.join(BASE, "config.json")
+SECRETS = os.path.join(BASE, "secrets")
 NOTION_TOKEN_FILE = os.path.join(SECRETS, "notion.json")
 XC_KEY_FILE = os.path.join(SECRETS, "xenocanto.json")
+# 旧版（WorkBuddy 时期）位置，仅用于读取兜底
+LEGACY_CFG = os.path.join(HOME, ".workbuddy", "birding-notes", "config.json")
+LEGACY_NOTION = os.path.join(HOME, ".workbuddy", "secrets", "notion.json")
+LEGACY_XC = os.path.join(HOME, ".workbuddy", "secrets", "xenocanto.json")
 NOTION_VERSION = "2026-03-11"
 
 
@@ -25,10 +30,12 @@ def out(d):
 
 
 def load_cfg():
-    try:
-        return json.load(open(CFG))
-    except Exception:
-        return {}
+    for p in (CFG, LEGACY_CFG):
+        try:
+            return json.load(open(p))
+        except Exception:
+            continue
+    return {}
 
 
 def save_json_private(path, data):
@@ -42,10 +49,12 @@ def get_token():
     t = os.environ.get("NOTION_TOKEN")
     if t:
         return t
-    try:
-        return json.load(open(NOTION_TOKEN_FILE))["integration_token"]
-    except Exception:
-        return None
+    for p in (NOTION_TOKEN_FILE, LEGACY_NOTION):
+        try:
+            return json.load(open(p))["integration_token"]
+        except Exception:
+            continue
+    return None
 
 
 def notion(path, body=None, token=None):
@@ -78,7 +87,7 @@ def cmd_status():
     steps = {
         "notion_token": bool(get_token()),
         "life_list_database_id": bool(n.get("life_list_database_id")),
-        "xenocanto_key (可选)": os.path.exists(XC_KEY_FILE),
+        "xenocanto_key (可选)": os.path.exists(XC_KEY_FILE) or os.path.exists(LEGACY_XC),
         "user_preferences (可选)": bool(cfg.get("user_preferences")),
     }
     required_ok = steps["notion_token"] and steps["life_list_database_id"]

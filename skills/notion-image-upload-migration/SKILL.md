@@ -1,10 +1,9 @@
 ---
 name: notion-image-upload-migration
 description: 把 Notion 页面里的外链图片（external URL，尤其 Wikimedia）迁移为 Notion 托管文件（file_upload）。适用于外链图报 "couldn't be loaded (Error 429)"、需要永久解决加载失败的场景。含本机国内网络环境的关键坑。
-agent_created: true
 ---
 
-> **前置检查**：涉及 Notion 读写前，先运行 `birding-setup/scripts/setup_helper.py status`；`ready: false` 就加载 `birding-setup` 完成配置引导，再继续本任务。
+> **前置检查**：涉及 Notion 读写前，先运行同仓库 `skills/birding-setup/scripts/setup_helper.py status`；`ready: false` 就按 `skills/birding-setup/SKILL.md` 完成配置引导，再继续本任务。
 
 # Notion 外链图 → 本地上传迁移
 

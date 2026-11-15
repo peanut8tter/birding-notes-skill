@@ -3,12 +3,9 @@ name: avilist-bird-lookup
 description: 用 AviList v2025 官方数据为中国常见鸟类查证学名、英文 common
   name、目（Order）、科（Family）。当用户需要按 AviList 标准记录鸟类分类学信息（特别是要写入 Notion
   数据库），或验证某个中文鸟名对应的 AviList 学名/英文名/科目时使用。skill 提供本地 AviList 数据查询脚本，避免逐条联网搜索。
-description_zh: AviList 鸟类查证
-description_en: AviList bird lookup
-agent_created: true
 ---
 
-> **前置检查**：涉及 Notion 读写前，先运行 `birding-setup/scripts/setup_helper.py status`；`ready: false` 就加载 `birding-setup` 完成配置引导，再继续本任务。
+> **前置检查**：涉及 Notion 读写前，先运行同仓库 `skills/birding-setup/scripts/setup_helper.py status`；`ready: false` 就按 `skills/birding-setup/SKILL.md` 完成配置引导，再继续本任务。
 
 # avilist-bird-lookup
 
@@ -53,12 +50,12 @@ $VENV/bin/pip install --quiet openpyxl
 $VENV/bin/python3 scripts/parse_avilist.py /tmp/avilist-v2025.xlsx
 ```
 
-参考脚本: @scripts/parse_avilist.py
+参考脚本: `scripts/parse_avilist.py`
 
 ### 2. 查证一批鸟名
 
 a. 先准备候选学名列表（中文名 → 候选学名），来源可以是已有的中国鸟类知识或郑光美名录
-b. 跑校验脚本：@scripts/verify_candidates.py
+b. 跑校验脚本：`scripts/verify_candidates.py`
 c. 对未匹配的：用同属其他物种或英文名搜索调整学名
 d. 对高风险条目（属名变更、近年拆分、地理种）做近缘种交叉确认
 

@@ -5,7 +5,7 @@
     "_comment": "Run this once with curl to find IDs:\n  curl 'https://api.notion.com/v1/search' \\\n    -H 'Authorization: Bearer <YOUR_TOKEN>' \\\n    -H 'Notion-Version: 2026-03-11' \\\n    -d '{\"query\": \"<page or database title>\"}'\n  Then read the 'id' field from the response.",
 
     "integration_token_env": "NOTION_TOKEN",
-    "integration_token_path": "~/.workbuddy/secrets/notion.json",
+    "integration_token_path": "~/.config/birding-notes/secrets/notion.json",
 
     "life_list_database_id": "<UUID of your bird life-list database, e.g. 37871355-4c9a-8073-b4a3-000b9cc2ea18>",
 
@@ -20,7 +20,7 @@
 
   "xenocanto": {
     "_comment": "Get a free API key at https://xeno-canto.org/account",
-    "api_key_path": "~/.workbuddy/secrets/xenocanto.json"
+    "api_key_path": "~/.config/birding-notes/secrets/xenocanto.json"
   },
 
   "user_preferences": {

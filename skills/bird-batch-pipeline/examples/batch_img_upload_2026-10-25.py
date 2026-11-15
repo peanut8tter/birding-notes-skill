@@ -7,7 +7,13 @@
 import json, subprocess, sys, time, os, mimetypes
 
 import os
-TOKEN = os.environ.get("NOTION_TOKEN") or json.load(open(os.path.expanduser("~/.workbuddy/secrets/notion.json")))["integration_token"]  # 由 birding-setup 保存
+def _load_token():
+    if os.environ.get("NOTION_TOKEN"): return os.environ["NOTION_TOKEN"]
+    base = os.environ.get("BIRDING_NOTES_HOME") or os.path.expanduser("~/.config/birding-notes")
+    for p in (os.path.join(base, "secrets", "notion.json"), os.path.expanduser("~/.workbuddy/secrets/notion.json")):
+        if os.path.exists(p): return json.load(open(p))["integration_token"]
+    sys.exit("未找到 Notion token：设置 NOTION_TOKEN，或让 AI 运行 birding-setup 向导")
+TOKEN = _load_token()  # 由 birding-setup 保存
 VER = "2026-03-11"
 DS = "37871355-4c9a-8073-b4a3-000b9cc2ea18"  # LifeList data_source（2026-10-24 实测有效）
 CACHE = "/tmp/lifelist_migration"

@@ -1,10 +1,9 @@
 ---
 name: bird-batch-pipeline
 description: 批量把鸟类条目从中文名清单入库到 Notion（建行、配图、写正文）的工程执行约定。当用户一次性提供多个鸟种（如「这些鸟帮我记到 Notion」、旅行预习清单、life list 批量补全）时使用。规定执行顺序、进度管理、后台运行方式，以及 Notion API、Wikimedia 图片、网络限流的避坑做法。单物种条目写作请用 birding-notes。
-agent_created: true
 ---
 
-> **前置检查**：涉及 Notion 读写前，先运行 `birding-setup/scripts/setup_helper.py status`；`ready: false` 就加载 `birding-setup` 完成配置引导，再继续本任务。
+> **前置检查**：涉及 Notion 读写前，先运行同仓库 `skills/birding-setup/scripts/setup_helper.py status`；`ready: false` 就按 `skills/birding-setup/SKILL.md` 完成配置引导，再继续本任务。
 
 # 批量入库流水线
 

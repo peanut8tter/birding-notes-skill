@@ -15,31 +15,32 @@ Get a free key at https://xeno-canto.org/account
 import argparse, json, os, sys, urllib.request, urllib.parse
 
 
+BASE = os.environ.get("BIRDING_NOTES_HOME") or os.path.expanduser("~/.config/birding-notes")
+XC_KEY_CANDIDATES = [
+    os.environ.get("XENOCANTO_KEY_FILE") or "",
+    os.path.join(BASE, "secrets", "xenocanto.json"),
+    os.path.expanduser("~/.workbuddy/secrets/xenocanto.json"),  # 旧位置兜底
+]
+
+
 def load_config():
-    here = os.path.dirname(os.path.abspath(__file__))
-    cfg_path = os.path.expanduser("~/.workbuddy/birding-notes/config.json")
-    if not os.path.exists(cfg_path):
-        cfg_path = os.path.join(os.path.dirname(here), "config.json")  # 旧位置兜底
-    if not os.path.exists(cfg_path):
-        print(
-            "ERROR: 未找到配置。请让 AI 运行 birding-setup 向导。",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-    return json.load(open(cfg_path))
+    return {}  # xc_query 只需要 key，不再依赖 config.json
 
 
-def load_xc_key(cfg):
-    path = os.path.expanduser(cfg["xenocanto"]["api_key_path"])
-    if not os.path.exists(path):
-        print(
-            f"ERROR: xeno-canto key file not found at {path}.\n"
-            f"Create it as: {{\"api_key\": \"<your_key>\"}}\n"
-            f"Get a free key at https://xeno-canto.org/account",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-    return json.load(open(path))["api_key"]
+def load_xc_key(cfg=None):
+    if os.environ.get("XENOCANTO_KEY"):
+        return os.environ["XENOCANTO_KEY"]
+    for path in XC_KEY_CANDIDATES:
+        if path and os.path.exists(path):
+            return json.load(open(path))["api_key"]
+    print(
+        "ERROR: 未找到 xeno-canto API key。\n"
+        "任选其一：设置环境变量 XENOCANTO_KEY；或让 AI 运行 birding-setup 向导；\n"
+        f"或手动创建 {XC_KEY_CANDIDATES[1]}，内容 {{\"api_key\": \"<your_key>\"}}\n"
+        "免费申请：https://xeno-canto.org/account",
+        file=sys.stderr,
+    )
+    sys.exit(1)
 
 
 def fetch(gen, sp, key):
