@@ -19,10 +19,15 @@ description: 学习与记录鸟类、植物、昆虫等自然知识的工作约�
 
 配置位置：`~/.config/birding-notes/config.json`（Notion 数据库 ID、地理偏好）；token 在 `~/.config/birding-notes/secrets/`；可用环境变量 `BIRDING_NOTES_HOME` 改位置。均不在仓库内。字段说明见 `config.example.json`。
 
-最低必填：
+**不要假设用户的库长什么样。** 用户可能是新建的标准库，也可能是接入他自己已有的库。因此：
 
-- `notion.life_list_database_id`
-- xeno-canto API key（可选，查鸣声用；环境变量 `XENOCANTO_KEY` 或 `secrets/xenocanto.json`）
+- 写 Notion 时，列名一律取 `config.json` 的 `notion.fields`（标准字段 key → 该库里的实际列名），**不要硬编码**「中文名」「学名」等列名。
+- 只写**已映射**的字段。「居留型」「IUCN 等级」「保护等级」「数据来源」等可选字段，没映射就不写、不报错、不自动建列（要建列须先征得用户同意，用 `setup_helper.py add-fields`）。
+- 物种名列填什么语言看 `user_preferences.name_language`（`zh` 中文名 / `en` 英文名），缺省按用户当前对话语言。
+- 地点相关判断（居留型、分布侧重、录音地）用 `user_preferences.primary_location / regional_focus / regional_focus_country`；**没配置就问用户或不判断，不要默认某个城市**。
+- 基础条目（名称/学名/目科等字段）可直接用 `skills/birding-setup/scripts/setup_helper.py add-rows` 写入：自动按 AviList 补全、去重、适配用户的列名。详细正文（分类考据等）再用 Notion 工具追加。
+
+最低必填：`notion.life_list_data_source_id`（或 database id）与 `notion.fields`（由 `birding-setup` 生成）。xeno-canto API key 可选，查鸣声用（环境变量 `XENOCANTO_KEY` 或 `secrets/xenocanto.json`）。
 
 ---
 
@@ -41,7 +46,7 @@ description: 学习与记录鸟类、植物、昆虫等自然知识的工作约�
 
 ### 2.1 名称三件套——**走 Notion 字段，不写正文**
 
-物种 / 目 / 科条目的「中文名 / 英文 common name / 拉丁双名」**已存在固定字段**（如 life list 的「学名」「Common name」字段）。
+物种 / 目 / 科条目的「中文名 / 英文 common name / 拉丁双名」**已存在固定字段**（如 life list 的「学名」「Common name」列；实际列名以 `notion.fields` 映射为准）。
 
 - **不要**在条目正文里再用整段把三件套复述一遍
 - 正文首段直接进入「拉丁名词源」「分类考据」等内容
@@ -217,7 +222,7 @@ data = json.loads(urllib.request.urlopen(urllib.request.Request(url, headers={'U
 
 **优先级 1**：用户在触发词中带了位置 → 严格按用户指定
 
-**优先级 2**：用户没带位置 → 按下表读取 `config.json`：
+**优先级 2**：用户没带位置 → 按下表读取 `config.json`。**对应 key 没配置就不要自作主张新建或乱放**：物种一律进 life list；其它类型告诉用户「还没有这类的存放位置，要我在 XX 页面下建一个吗？」再动手：
 
 | 条目类型 | 默认位置（config.json key） |
 |---|---|
@@ -290,6 +295,8 @@ API v2025-09-03 起：**select 字段的 option 名字和颜色一旦创建就�
 ---
 
 ## 6. 配图规范
+
+> 本节是作者个人偏好的默认值。用户若表达了不同偏好（例如想要实拍生态照来辅助认鸟），**以用户为准**，并写入 `user_preferences.image_inclusion_policy`；已配置则优先按它执行。
 
 ### 6.1 第一原则：**只放有信息增量的图**
 

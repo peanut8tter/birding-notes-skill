@@ -4,6 +4,14 @@
   "notion": {
     "_comment": "Run this once with curl to find IDs:\n  curl 'https://api.notion.com/v1/search' \\\n    -H 'Authorization: Bearer <YOUR_TOKEN>' \\\n    -H 'Notion-Version: 2026-03-11' \\\n    -d '{\"query\": \"<page or database title>\"}'\n  Then read the 'id' field from the response.",
 
+    "life_list_data_source_id": "<由 birding-setup 自动生成>",
+    "fields": {
+      "_comment": "标准字段 -> 你的库里的实际列名，由 birding-setup 自动生成，一般不需要手改",
+      "name": "中文名", "sci": "学名", "en": "Common name", "order": "目", "family": "科",
+      "first_place": "首次地点", "first_date": "首次日期", "residency": "居留型",
+      "iucn": "IUCN 等级", "protection": "中国保护等级", "source": "数据来源"
+    },
+
     "integration_token_env": "NOTION_TOKEN",
     "integration_token_path": "~/.config/birding-notes/secrets/notion.json",
 
@@ -24,9 +32,11 @@
   },
 
   "user_preferences": {
-    "primary_location": "广州",
-    "regional_focus": "华南",
-    "regional_focus_country": "China",
-    "image_inclusion_policy": "信息增量原则；古画/解剖/系统树优先；普通生态摄影不放"
+    "_comment": "示例值，实际由 birding-setup 询问用户后生成。",
+    "primary_location": "<你常观鸟的城市，如 广州>",
+    "regional_focus": "<地区，如 华南>",
+    "regional_focus_country": "<国家，如 China>",
+    "name_language": "zh",
+    "image_inclusion_policy": "（可选）如：信息增量原则；古画/解剖/系统树优先；普通生态摄影不放"
   }
 }

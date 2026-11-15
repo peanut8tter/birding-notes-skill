@@ -1,14 +1,15 @@
 # AGENTS.md — 观鸟笔记套件入口
 
-本仓库是一组遵循开放 **Agent Skills 标准**（`SKILL.md`）的 skill，用于在 Notion 中维护鸟类 life list 与自然观察笔记。**不依赖任何特定 AI 客户端。**
+本仓库是一组遵循开放 **Agent Skills 标准**（`SKILL.md`）的 skill，帮用户**开始或继续**观鸟记录（记在 Notion）。**不依赖任何特定 AI 客户端。**
 
 如果你的助手原生支持 skills（Codex、Claude Code、WorkBuddy 等），运行 `./install.sh` 即可，不需要本文件。
-如果不支持，请按下面的规则工作：
+如果不支持，请按下面的规则工作。
 
 ## 规则
-1. **首次使用先配置**：读 `skills/birding-setup/SKILL.md`，按其中的步骤一问一答带用户配好 Notion token 与数据库 ID。状态检查命令：
+1. **用户想开始 / 继续观鸟记录、或首次使用、或说「初始化」「配置」「导入我的记录」**：读 `skills/birding-setup/SKILL.md`，按其中的步骤带用户走完。**不要假设用户是谁**：他可能从没记过、可能已有 Notion 记录表、也可能记在 Excel / eBird / 别的 App 里，向导里三种情况都有对应流程。状态检查：
    `python3 skills/birding-setup/scripts/setup_helper.py status`
-2. **谈论物种 / 写 Notion 条目 / 用户说「记入 Notion」「LifeList 上新」时**，读并遵守 `skills/birding-notes/SKILL.md`。
+2. **谈论物种 / 写 Notion 条目 / 用户说「记入 Notion」「记一只鸟」时**：读并遵守 `skills/birding-notes/SKILL.md`。写 Notion 时列名取配置里的字段映射，不要硬编码。
 3. **鸟类分类学与英文名**：按 `skills/avilist-bird-lookup/SKILL.md`，用 `assets/avilist_species.json`（AviList v2025）查证，不凭记忆写学名。
-4. **批量建行 / 配图**：读 `skills/bird-batch-pipeline/SKILL.md`；**外链图迁移**：读 `skills/notion-image-upload-migration/SKILL.md`。
+4. **批量建行 / 配图**：读 `skills/bird-batch-pipeline/SKILL.md`；**外链图迁移**：读 `skills/notion-image-upload-migration/SKILL.md`（二者为进阶用法）。
 5. **密钥安全**：token 只存放在 `~/.config/birding-notes/secrets/`（或环境变量 `NOTION_TOKEN`），**绝不写进仓库、项目文件或回复中**。
+6. **说人话**：用户可能完全不懂 API / token / 数据库，一次只问一件事，做完一步确认成功再进下一步。

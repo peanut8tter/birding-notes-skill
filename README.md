@@ -1,12 +1,43 @@
 # birding-notes-skill
 
-> 一份给 AI 用的"自然知识工作流协议"——专为**在 Notion 维护 life list 与自然观察笔记**的人设计。
+> 让 AI 帮你**开始、或继续**观鸟记录：把看过的鸟记进 Notion，学名分类由 AI 对照 AviList 查准，不瞎编。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 &nbsp;
-Status: 个人在用 · 欢迎 fork
+适用于 Codex · Claude Code · WorkBuddy · Cursor 等支持 Agent Skills（SKILL.md）的 AI 助手
 
 ---
+
+## 30 秒上手
+
+```bash
+git clone https://github.com/peanut8tter/birding-notes-skill.git ~/birding-notes-skill
+cd ~/birding-notes-skill && ./install.sh
+```
+
+然后打开你的 AI 助手（装完 skill 后需重启），对它说：
+
+> **帮我开始观鸟记录**
+
+它会一步步带你走完，约 5 分钟，**不需要你懂任何技术**。你只需要一个 Notion 账号（免费版就够）。
+
+## 不管你现在处于哪种情况
+
+| 你的情况 | AI 会帮你做什么 |
+|---|---|
+| **还没开始记** | 在你的 Notion 里新建一张观鸟记录表（物种、学名、分类、首次观察的时间地点等），再陪你记下第一只鸟 |
+| **Notion 里已经有一张记录表** | 读懂你现有的表头并和你确认对应关系；只新增缺的列，**不改你已有的列和数据**；之后写入沿用你的列名 |
+| **记在别处**（Excel、eBird、观鸟 App、备忘录、微信、纸上） | 先建好新表，再把旧记录整理、核对学名、去重后批量导入（eBird 的导出文件、CSV、直接粘贴文字都行） |
+
+之后日常使用就是一句话：
+
+```
+记一只鸟：白头鹎，今天在海珠湿地见到
+把这个 eBird 导出文件导进来
+查一下红嘴蓝鹊的学名和分类
+我已经记了多少种？
+把这只写详细（分类考据 / 分布 / 鸣声 / 文化背景）
+```
 
 ## 这是什么
 
@@ -14,9 +45,19 @@ Status: 个人在用 · 欢迎 fork
 
 它不是一个软件，是 **AI 与你之间签订的工作流协议**。每次自然知识相关对话自动加载，免去你反复叮嘱的成本。
 
+套件由 5 个 skill 组成，**新手只需要关注前 3 个**，装好就行，AI 会按需调用：
+
+| skill | 做什么 | 谁会用到 |
+|---|---|---|
+| `birding-setup` | 入口与向导：建表 / 接入已有表 / 导入旧记录 / 批量写入 | 所有人，第一次必用 |
+| `birding-notes` | 条目写作规范：分类考据、分布、鸣声、文化背景、配图 | 所有人 |
+| `avilist-bird-lookup` | 用 AviList v2025 查证学名、英文名、目、科 | 所有人 |
+| `bird-batch-pipeline` | 一次记几十种的批量流水线（建行、配图、写正文） | 进阶 |
+| `notion-image-upload-migration` | 把外链图迁成 Notion 托管图（避免外链 429） | 进阶 |
+
 ## 解决什么痛点
 
-> 我用 AI 维护鸟类 life list 时反复遇到的几个坑：
+> 作者用 AI 维护鸟类 life list 时反复遇到的几个坑，本套件就是针对它们设计的：
 
 1. **拉丁名解释啰嗦**——AI 总爱写"形容……""因……"，应当**词典式直击词根**
 2. **冗余复述三件套**——中文名/英文名/学名在 Notion 字段里已有，AI 总在正文再写一遍
@@ -59,36 +100,37 @@ cd ~/birding-notes-skill
 
 **你的助手不支持 skills？** 把仓库里的 [`AGENTS.md`](AGENTS.md) 复制到项目根目录（或让助手先读它），它会指引助手按需读取 `skills/*/SKILL.md`。
 
-### 2. 配置：直接对 AI 说「初始化观鸟笔记」
+### 2. 配置：对 AI 说「帮我开始观鸟记录」
 
-不用手写 JSON。`birding-setup` skill 会一问一答带你配完：
+不用手写任何配置。`birding-setup` 会先问你**现在的记录在哪**，再走对应的路：
 
-1. 你的 Notion Internal Integration token（会先向 Notion 校验再保存，权限 600）
-2. 把 life list 数据库共享给 integration，AI 帮你搜到并记下数据库 ID
-3. 可选：目录库、xeno-canto API key（鸣声）、常驻地点与关注区域
+1. 连接 Notion：带你创建一个「集成」并拿到密钥（脚本会先向 Notion 校验再保存，权限 600）
+2. 准备记录表：**从零新建** / **接入你已有的表**（自动识别表头、只新增缺的列）/ **从 Excel、eBird 等导入旧记录**
+3. 两个小问题：你在哪观鸟、物种名用中文还是英文（都可跳过）
+4. 一起记下第一只鸟
 
-之后第一次让 AI 干观鸟相关的活，如果没配置，它也会自动进入这个向导，配完继续你原来的任务。
+之后任何观鸟相关的请求，如果还没配置，AI 会自动进入这个向导，配完再继续你原来的请求。
 
 存放位置（都在仓库外，不会被提交）：
-- 配置：`~/.config/birding-notes/config.json`
+- 配置：`~/.config/birding-notes/config.json`（含「标准字段 → 你的列名」对应关系）
 - 密钥：`~/.config/birding-notes/secrets/notion.json`、`xenocanto.json`
 - 想换位置：设置环境变量 `BIRDING_NOTES_HOME`
+- 换电脑：再说一次「帮我开始观鸟记录」，AI 会识别出你已有的表并接上，不会重复建表
 
-Notion integration 创建入口：[notion.so/profile/integrations](https://www.notion.so/profile/integrations)（类型选 Internal，token 以 `ntn_` 开头）。
-
-### 5. AviList 本地数据
+### 3. AviList 本地数据（无需操作）
 
 `assets/avilist_species.json`（AviList v2025，11,131 种）已随仓库提供，`avilist-bird-lookup` 直接查询即可，无需再下载解析。
 
 ## 使用
 
-加载完 skill 后，直接和 AI 对话即可：
+装好并配置后，直接和 AI 对话：
 
 ```
-"帮我查查红嘴蓝鹊"            → AI 按规则给出分类考据 + 分布 + 鸣声 + 文化背景
-"对比白头鹎和黑短脚鹎"        → AI 触发「识别区分」块
-"记入到 Notion"               → AI 直接写到对应数据库 / page
-"加进 life list，地点：白云山" → AI 写 life list 并填首次地点
+"帮我查查红嘴蓝鹊"            → 分类考据 + 分布 + 鸣声 + 文化背景
+"对比白头鹎和黑短脚鹎"        → 「识别区分」块
+"记一只鸟：XX，在 YY"          → 写进你的记录表，自动补全学名分类
+"导入我的 eBird 数据"          → 按物种合并、核对学名、去重后批量写入
+"把这只写详细"                 → 在条目正文里补全分类考据 / 分布 / 鸣声 / 文化背景
 ```
 
 ## 内容结构（精简）
