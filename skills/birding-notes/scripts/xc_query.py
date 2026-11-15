@@ -24,7 +24,14 @@ XC_KEY_CANDIDATES = [
 
 
 def load_config():
-    return {}  # xc_query 只需要 key，不再依赖 config.json
+    """读 birding-setup 生成的配置；没有就返回空（录音地偏好默认不设）。"""
+    for p in (os.path.join(BASE, "config.json"), os.path.expanduser("~/.workbuddy/birding-notes/config.json")):
+        if os.path.exists(p):
+            try:
+                return json.load(open(p))
+            except Exception:
+                pass
+    return {}
 
 
 def load_xc_key(cfg=None):
@@ -80,7 +87,7 @@ def main():
 
     cfg = load_config()
     key = load_xc_key(cfg)
-    prefer = cfg["user_preferences"].get("regional_focus_country", "China")
+    prefer = (cfg.get("user_preferences") or {}).get("regional_focus_country")   # 没配置就不偏向任何国家
 
     data = fetch(gen, sp, key)
     recs = data.get("recordings", [])

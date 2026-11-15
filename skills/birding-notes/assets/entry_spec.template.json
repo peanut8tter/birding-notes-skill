@@ -1,0 +1,36 @@
+{
+  "_说明": "复制本文件，改成你要写的物种，交给 skills/birding-setup/scripts/entry_tools.py write-body 写入。_ 开头的键会被忽略。章节标题不带 emoji 也行，工具会自动补。没有的块（如没找到古画）直接删掉那个键，不要留占位。",
+
+  "image": {
+    "path": "find-images 选中的那张图的 path（本地文件或 http 链接）",
+    "caption": "📷 作者 · Wikimedia Commons · 许可证（直接用 find-images 给的 caption）",
+    "source_url": "find-images 给的 source_url（可选，会在 caption 后追加「来源页」链接）"
+  },
+
+  "callout": {"emoji": "🐦", "text": "首次记录：2026-03-01 · 地点（用户没给日期地点就删掉整个 callout）"},
+
+  "sections": [
+    {"title": "🐾 性格与行为",
+     "bullets": ["事实一条（不拟人不抒情）", "事实一条", "事实一条"]},
+
+    {"title": "🧬 分类考据",
+     "subsections": [
+       {"title": "拉丁名词源", "bullets": ["*Genus* —— 词根与含义", "*species* —— 词根与含义", "中文名的由来（如有）"]},
+       {"title": "系统位置", "bullets": ["目 Order › 科 Family › 属 *Genus*", "有分类动荡才写：曾用名 / 拆分合并"]}
+     ]},
+
+    {"title": "🌏 分布与生态",
+     "bullets": ["全球分布", "用户所在地的居留状况与栖息环境（用户没配置所在地就省略）"],
+     "bookmark": "entry_tools.py gbif 给的 url",
+     "bookmark_caption": "GBIF · Genus species · 全球出现记录"},
+
+    {"title": "🎵 鸣声 / 鸣唱",
+     "bullets": ["情境：音色与节奏（拟声词必须有依据）"],
+     "bookmark": "https://xeno-canto.org/<XC_ID>",
+     "bookmark_caption": "xeno-canto · XC<ID> · 国家, 地点 · type · 录音师 · CC 许可证"},
+
+    {"title": "📜 文化与演化",
+     "bullets": ["名字典故 / 诗词典籍 / 民俗 / 科学史（确证的才写）"],
+     "image": {"path": "find-images --art 选中的图", "caption": "🎨 作者 / 年代 / 现藏地 · 公版 · Wikimedia Commons", "source_url": "..."}}
+  ]
+}

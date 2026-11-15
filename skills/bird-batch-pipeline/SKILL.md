@@ -54,7 +54,8 @@ bird-batch-pipeline 批量怎么跑通（本 skill）
 
 ### 阶段 2：建行填字段（快，先让库里有东西）
 
-- 建 page 时**不要传 icon**（用户不要标题前带 emoji）
+- 建行直接用 `skills/birding-setup/scripts/setup_helper.py add-rows`（自动补全、去重、适配用户列名、返回 page id）；下文的一次性脚本是作者的定制版，可参考但不必照抄
+- 建 page 时**不要传页面图标 icon**（作者不要标题前带 emoji；注意这与正文里的章节标题 emoji 是两回事，章节标题**要**带 emoji）
 - 补缺失的目/科 select 选项，一次 PATCH 补齐
 - 注意 §Notion 坑：select option 建后不可改名
 
@@ -64,7 +65,12 @@ bird-batch-pipeline 批量怎么跑通（本 skill）
 
 ### 阶段 4：写正文
 
-一次 PATCH 写入全部 block（图必须是第一个 block）。
+版式、模块、写作口径以 `skills/birding-notes/SKILL.md` §4（v2：实拍首图 → 提示框 → 🐾 性格与行为 → 🧬 分类考据 → 🌏 分布与生态 → 🎵 鸣声 → 📜 文化与演化）和 §6 为准。
+
+**推荐用工具写**：每种生成一个 spec（模板 `skills/birding-notes/assets/entry_spec.template.json`），
+`python3 skills/birding-setup/scripts/entry_tools.py write-body <page_id> <spec.json>`。
+它一次写入全部 block（图必须是第一个 block）、上传图片、补全章节 emoji、对照用户启用的模块报警告；页面已有内容默认跳过，可安全重跑。
+`entry_tools.py empty-pages` 列出还没有正文的物种，批量时用它分批、续跑。
 
 ---
 

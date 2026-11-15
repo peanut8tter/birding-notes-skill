@@ -37,6 +37,9 @@
     "regional_focus": "<地区，如 华南>",
     "regional_focus_country": "<国家，如 China>",
     "name_language": "zh",
+    "entry_depth": "full",
+    "entry_modules": ["behavior", "taxonomy", "distribution", "voice", "culture"],
+    "entry_images": "both",
     "image_inclusion_policy": "（可选）如：信息增量原则；古画/解剖/系统树优先；普通生态摄影不放"
   }
 }

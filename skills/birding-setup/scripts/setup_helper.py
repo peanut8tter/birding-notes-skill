@@ -6,7 +6,9 @@
   set-notion-token <token>            先向 Notion 校验，通过才保存
   find <关键词> [--pages|--databases]  搜索已共享给 integration 的页面 / 数据库
   inspect <id>                        读取一个已有数据库：有哪些列、行数、与标准字段的对应建议
-  create-db <父页面id> [--title T]     在父页面下新建「标准结构」的 life list 数据库，并自动保存配置
+  create-db <父页面id> [--title T] [--fields k1,k2,..] [--extra "列名:类型,.."] [--lang zh|en]
+                                      按用户选择的字段新建 life list 数据库（核心字段必含），并自动保存配置。
+                                      --extra 为自定义列，类型：text select multi_select date number url checkbox
   add-fields <key...>                 给当前数据库补充缺少的标准字段（不改动已有列）
   map <key>=<列名> ...                 把标准字段对应到已有数据库的某一列
   list-rows [--limit N]               列出库里已有的物种（继续记录前先看看）
@@ -14,7 +16,8 @@
                                       批量写入。JSON 为数组，每项用标准字段 key，如
                                       {"name":"树麻雀","sci":"Passer montanus","first_date":"2026-03-01"}
                                       默认按 sci 用 AviList 补全 en/order/family/source，并按名称/学名去重
-  set <key> <value>                   写 config，key 用点号，如 user_preferences.primary_location
+  set <key> <value>                   写 config，key 用点号；值以 [ 或 { 开头会按 JSON 解析（用于列表偏好）
+                                      如 user_preferences.entry_modules '["taxonomy","distribution"]' 
   set-xc-key <key>                    保存 xeno-canto API key（可选）
 
 标准字段 key：name sci en order family first_place first_date residency iucn protection source
@@ -37,28 +40,30 @@ NOTION_VERSION = "2026-03-11"
 # ---------------------------------------------------------------- 标准字段定义
 FIELDS = [
     # key / 说明 / 默认列名 / 类型 / 是否核心 / 同义列名（用于识别别人已有的库）/ 初始选项
-    dict(key="name", label="名称（物种名）", col="中文名", type="title", core=True,
+    dict(key="name", label="名称（物种名）", col="中文名", col_en="Name", type="title", core=True,
          syn=["名称", "name", "物种", "鸟名", "种名", "species", "title", "鸟种", "bird", "中文名", "名字"]),
-    dict(key="sci", label="学名", col="学名", type="rich_text", core=True,
+    dict(key="sci", label="学名", col="学名", col_en="Scientific name", type="rich_text", core=True,
          syn=["scientific name", "scientific", "latin", "拉丁名", "拉丁学名", "latin name", "binomial"]),
-    dict(key="en", label="英文名", col="Common name", type="rich_text",
+    dict(key="en", label="英文名", col="Common name", col_en="Common name", type="rich_text",
          syn=["english name", "english", "英文名", "英文", "common name", "英文名称"]),
-    dict(key="order", label="目", col="目", type="select", syn=["order"]),
-    dict(key="family", label="科", col="科", type="select", syn=["family"]),
-    dict(key="first_place", label="首次观察地点", col="首次地点", type="rich_text",
+    dict(key="order", label="目", col="目", col_en="Order", type="select", syn=["order"]),
+    dict(key="family", label="科", col="科", col_en="Family", type="select", syn=["family"]),
+    dict(key="first_place", label="首次观察地点", col="首次地点", col_en="First seen at", type="rich_text",
          syn=["地点", "location", "place", "观察地点", "where", "首次观察地点", "site", "locality", "观鸟地点"]),
-    dict(key="first_date", label="首次观察日期", col="首次日期", type="date",
+    dict(key="first_date", label="首次观察日期", col="首次日期", col_en="First seen on", type="date",
          syn=["日期", "date", "首次记录", "观察日期", "first seen", "首次观察", "时间", "见到日期", "observation date"]),
-    dict(key="residency", label="居留型（留鸟/候鸟…，按你的观察地判定）", col="居留型", type="select",
+    dict(key="residency", label="居留型（留鸟/候鸟…，按你的观察地判定）", col="居留型", col_en="Residency", type="select",
+         opts_en=["Resident", "Summer visitor", "Winter visitor", "Passage migrant", "Vagrant", "Uncertain"],
          syn=["residency", "居留", "status", "居留类型", "迁徙类型"],
          opts=["留鸟", "夏候鸟", "冬候鸟", "旅鸟", "迷鸟", "不确定"]),
-    dict(key="iucn", label="IUCN 受胁等级", col="IUCN 等级", type="select",
+    dict(key="iucn", label="IUCN 受胁等级", col="IUCN 等级", col_en="IUCN status", type="select",
          syn=["iucn", "保护状态", "受胁等级", "红色名录", "conservation status"],
          opts=["LC", "NT", "VU", "EN", "CR", "DD"]),
-    dict(key="protection", label="本国保护等级（中国：国家一/二级、三有）", col="中国保护等级", type="select",
+    dict(key="protection", label="本国保护等级（中国：国家一/二级、三有）", col="中国保护等级", col_en="Protection status", type="select",
+         opts_en=["Class I", "Class II", "Regionally listed", "Not listed"],
          syn=["保护等级", "protection", "国家保护", "protected"],
          opts=["国家一级", "国家二级", "三有", "未列入"]),
-    dict(key="source", label="分类数据来源", col="数据来源", type="select",
+    dict(key="source", label="分类数据来源", col="数据来源", col_en="Taxonomy source", type="select",
          syn=["source", "来源", "分类标准"], opts=["AviList v2025"]),
 ]
 BY_KEY = {f["key"]: f for f in FIELDS}
@@ -95,6 +100,9 @@ def cfg_set(key, val):
     parts = key.split(".")
     for p in parts[:-1]:
         cur = cur.setdefault(p, {})
+    if isinstance(val, str) and val.strip()[:1] in "[{":
+        try: val = json.loads(val)
+        except Exception: pass
     cur[parts[-1]] = val
     save_json_private(CFG, cfg)
     return cfg
@@ -210,7 +218,7 @@ def suggest_mapping(props):
     used, mapping = set(), {}
     norm = lambda s: s.strip().lower()
     for f in FIELDS:
-        cands = [norm(f["col"])] + [norm(s) for s in f["syn"]]
+        cands = [norm(f["col"]), norm(f.get("col_en", ""))] + [norm(s) for s in f["syn"]]
         hit = None
         for name, v in props.items():
             if name in used:
@@ -238,13 +246,15 @@ def cmd_status():
         "notion_token": has_token,
         "database_configured": has_db,
         "fields_mapped": all(k in fields for k in CORE_KEYS) if has_db else False,
-        "user_preferences (可选)": bool(cfg.get("user_preferences")),
+        "entry_preferences": bool((cfg.get("user_preferences") or {}).get("entry_depth")),
+        "user_preferences (可选)": bool((cfg.get("user_preferences") or {}).get("primary_location")),
         "xenocanto_key (可选)": os.path.exists(XC_KEY_FILE) or os.path.exists(LEGACY_XC),
     }
     nxt = None
     if not has_token: nxt = "notion_token"
     elif not has_db: nxt = "database（新建 create-db，或接入已有 inspect+map）"
     elif not steps["fields_mapped"]: nxt = "map（缺少字段映射：对已有库跑 inspect 后 map）"
+    elif not steps["entry_preferences"]: nxt = "entry_preferences（还没问过用户要不要写正文、写哪些模块、要不要配图：见 birding-setup 步骤 3）"
     out({"ready": nxt is None, "steps": steps, "next": nxt, "config_path": CFG,
          "mapping": fields or None, "preferences": cfg.get("user_preferences")})
 
@@ -291,12 +301,21 @@ def cmd_inspect(i):
          "next": "把 suggested_mapping 用大白话给用户确认；确认后：set notion.life_list_data_source_id / database_id，再 map 保存映射；缺的字段问用户是否 add-fields"})
 
 
-def _prop_schema(f):
+def _prop_schema(f, lang="zh"):
     t = f["type"]
     if t == "title": return {"title": {}}
-    if t == "select": return {"select": {"options": [{"name": o} for o in f.get("opts", [])]}}
-    if t == "date": return {"date": {}}
+    if t == "select":
+        opts = f.get("opts_en") if lang == "en" and f.get("opts_en") else f.get("opts", [])
+        return {"select": {"options": [{"name": o} for o in opts]}}
+    if t == "multi_select": return {"multi_select": {"options": []}}
+    if t in ("date", "number", "url", "checkbox"):
+        return {t: {"format": "number"}} if t == "number" else {t: {}}
     return {"rich_text": {}}
+
+
+EXTRA_TYPES = {"text": "rich_text", "文本": "rich_text", "select": "select", "单选": "select", "multi_select": "multi_select",
+               "多选": "multi_select", "date": "date", "日期": "date", "number": "number", "数字": "number", "url": "url",
+               "链接": "url", "checkbox": "checkbox", "勾选": "checkbox"}
 
 
 def cmd_create_db(args):
@@ -306,7 +325,20 @@ def cmd_create_db(args):
     title = "观鸟笔记 · Life List"
     if "--title" in args:
         title = args[args.index("--title") + 1]
-    props = {f["col"]: _prop_schema(f) for f in FIELDS}
+    lang = args[args.index("--lang") + 1] if "--lang" in args else "zh"
+    keys = args[args.index("--fields") + 1].split(",") if "--fields" in args else [f["key"] for f in FIELDS]
+    keys = [k for k in [f["key"] for f in FIELDS] if k in keys or k in CORE_KEYS]   # 核心字段必含
+    chosen = [BY_KEY[k] for k in keys]
+    colname = lambda f: f["col_en"] if lang == "en" else f["col"]
+    props = {colname(f): _prop_schema(f, lang) for f in chosen}
+    extra = {}
+    if "--extra" in args:   # 例: --extra "天气:text,同行者:text,评分:number"
+        for item in args[args.index("--extra") + 1].split(","):
+            name, _, typ = item.strip().partition(":")
+            if not name: continue
+            t = EXTRA_TYPES.get(typ.strip() or "text")
+            if not t: die({"ok": False, "reason": f"自定义列类型不支持: {typ}", "supported": sorted(set(EXTRA_TYPES))})
+            props[name] = _prop_schema({"type": t}); extra[name] = t
     body = {"parent": {"type": "page_id", "page_id": parent},
             "title": [{"type": "text", "text": {"content": title}}],
             "initial_data_source": {"properties": props}}
@@ -316,10 +348,11 @@ def cmd_create_db(args):
         die({"ok": False, "reason": "已创建但没拿到数据源 id", "detail": r})
     cfg_set("notion.life_list_database_id", r["id"])
     cfg_set("notion.life_list_data_source_id", ds_id)
-    cfg_set("notion.fields", {f["key"]: f["col"] for f in FIELDS})
+    cfg_set("notion.fields", {f["key"]: colname(f) for f in chosen})
+    cfg_set("notion.extra_columns", extra)
     cfg_set("notion.bird_root_page_id", parent)
     out({"ok": True, "database_id": r["id"], "data_source_id": ds_id, "url": r.get("url"),
-         "columns": [f["col"] for f in FIELDS], "saved": "已写入配置（含字段映射）"})
+         "columns": list(props), "saved": "已写入配置（含字段映射）"})
 
 
 def cmd_add_fields(keys):
@@ -385,7 +418,7 @@ def cmd_list_rows(args):
     rows = _all_rows(ds["id"], limit)
     nc, sc = fields.get("name"), fields.get("sci")
     out({"ok": True, "count": len(rows),
-         "species": [{"name": _cell(r, nc), "sci": _cell(r, sc) if sc else ""} for r in rows]})
+         "species": [{"name": _cell(r, nc), "sci": _cell(r, sc) if sc else "", "id": r["id"], "url": r.get("url")} for r in rows]})
 
 
 def _build_prop(ptype, val):
@@ -404,6 +437,7 @@ def _build_prop(ptype, val):
         except Exception:
             return "BADDATE"
     if ptype == "url": return {"url": v}
+    if ptype == "checkbox": return {"checkbox": v.lower() in ("1", "true", "yes", "y", "是", "✓", "√")}
     if ptype == "number":
         try: return {"number": float(v)}
         except Exception: return None
@@ -430,15 +464,16 @@ def cmd_add_rows(args):
     have_name = {_cell(r, fields["name"]).strip().lower() for r in existing}
     have_sci = {_cell(r, fields["sci"]).strip().lower() for r in existing} if "sci" in fields else set()
 
-    report = {"created": [], "skipped_duplicate": [], "failed": [], "notes": []}
+    report = {"created": [], "pages": {}, "skipped_duplicate": [], "failed": [], "notes": []}
     for row in rows_in:
         row = dict(row)
+        auto_filled = set()
         sci = str(row.get("sci", "")).strip()
         if enrich and sci:
             hit = av.get(sci.lower())
             if hit:
-                row.setdefault("en", hit["en"]); row.setdefault("order", hit["order"])
-                row.setdefault("family", hit["family"]); row.setdefault("source", "AviList v2025")
+                for k, v in (("en", hit["en"]), ("order", hit["order"]), ("family", hit["family"]), ("source", "AviList v2025")):
+                    if k not in row: row[k] = v; auto_filled.add(k)
             else:
                 report["notes"].append(f"{row.get('name') or sci}: 学名「{sci}」不在 AviList v2025 中，未自动补全目/科（请核对拼写或是否为异名）")
         nm = str(row.get("name", "")).strip()
@@ -448,9 +483,9 @@ def cmd_add_rows(args):
             report["skipped_duplicate"].append(nm); continue
         page_props, dropped = {}, []
         for k, v in row.items():
-            col = fields.get(k)
+            col = fields.get(k) or (k if k in props and k not in BY_KEY else None)   # 标准字段 key，或直接写列名（自定义列）
             if not col or col not in props:
-                if k in BY_KEY and str(v).strip(): dropped.append(k)
+                if str(v).strip() and k not in auto_filled: dropped.append(k)
                 continue
             built = _build_prop(props[col]["type"], v)
             if built == "BADDATE":
@@ -466,7 +501,8 @@ def cmd_add_rows(args):
         if "error" in r:
             report["failed"].append({"name": nm, "why": r.get("message")})
         else:
-            report["created"].append(nm); have_name.add(nm.lower())
+            report["created"].append(nm); report["pages"][nm] = {"id": r["id"], "url": r.get("url")}
+            have_name.add(nm.lower())
             if sci: have_sci.add(sci.lower())
         time.sleep(0.35)
     report["summary"] = {k: len(report[k]) for k in ("created", "skipped_duplicate", "failed")}
